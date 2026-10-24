@@ -1,99 +1,126 @@
 import React from 'react';
-import { Award, GraduationCap, HeartPulse, CheckCircle2, MessageCircle, Sparkles } from 'lucide-react';
+import { Heart, MessageSquare, ShieldCheck, ArrowRight } from 'lucide-react';
 
-export default function AboutDoctor() {
-  const DEMO_WHATSAPP_URL = "https://wa.me/15552345678?text=Hi%20Dr.%20Sarah,%20I%20have%20a%20question%20about%20dental%20care.";
+const FEATURES = [
+  {
+    icon: Heart,
+    title: 'Patient-Focused Consultations',
+    description:
+      'Every visit begins with a thorough conversation about your concerns, comfort, and care preferences.',
+  },
+  {
+    icon: MessageSquare,
+    title: 'Clear Communication',
+    description:
+      'We walk you through treatment options in plain language so you can make informed decisions with confidence.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Preventive Approach',
+    description:
+      'We emphasise early detection and oral hygiene guidance to help you maintain long-term dental health.',
+  },
+];
 
+export default function About({ onOpenBooking }) {
   return (
-    <section id="about-doctor" className="py-14 lg:py-20 bg-white border-y border-slate-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div className="grid lg:grid-cols-12 gap-10 items-center">
-          
-          {/* Doctor Local Image */}
-          <div className="lg:col-span-5 relative">
-            <div className="relative rounded-3xl overflow-hidden shadow-lg border border-slate-200 bg-slate-100">
+    <section id="about" className="py-16 lg:py-24" style={{ background: 'white' }}>
+      <div className="container-site">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+          {/* Left: Image */}
+          <div className="relative order-2 lg:order-1">
+            <div
+              className="rounded-3xl overflow-hidden shadow-xl border-4"
+              style={{ borderColor: 'white' }}
+            >
               <img
-                src="/images/doctor-about.jpg"
-                alt="Dr. Sarah Mitchell inside clinic"
-                className="w-full h-[400px] object-cover object-center"
-                onError={(e) => {
-                  e.currentTarget.src = '/images/doctor-sarah.jpg';
-                }}
+                src="/images/about-clinic.png"
+                alt="Dentist in consultation with a patient at Ivory Dental Studio"
+                className="w-full h-[380px] sm:h-[460px] object-cover"
+                onError={(e) => { e.currentTarget.src = '/images/doctor-about.jpg'; }}
+                loading="lazy"
               />
-              <div className="p-5 bg-slate-900 text-white">
-                <div className="flex items-center gap-1.5 text-teal-400 text-xs font-bold uppercase tracking-wider">
-                  <Award className="w-4 h-4" /> Sample Credentials • Demo Concept
-                </div>
-                <h4 className="text-base font-bold text-white mt-1">UCLA Dental School Graduate (Sample)</h4>
-                <p className="text-xs text-slate-300 mt-0.5">Focused on comfortable dental care, clear aligners, and cosmetic smile planning.</p>
-              </div>
             </div>
+
+            {/* Decorative accent */}
+            <div
+              className="absolute -bottom-5 -left-5 w-40 h-40 rounded-3xl -z-10"
+              style={{ background: '#EAF5F1' }}
+              aria-hidden="true"
+            />
+            <div
+              className="absolute -top-5 -right-5 w-24 h-24 rounded-2xl -z-10"
+              style={{ background: '#C8E8E0' }}
+              aria-hidden="true"
+            />
           </div>
 
-          {/* Bio & Philosophy Content */}
-          <div className="lg:col-span-7 space-y-5">
-            
+          {/* Right: Content */}
+          <div className="space-y-7 order-1 lg:order-2">
+
             <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-100 text-teal-800">
-                <Sparkles className="w-3.5 h-3.5" /> Concept Dental Profile
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-2">
-                About Dr. Sarah Mitchell, DDS
+              <p
+                className="text-xs font-bold uppercase tracking-[0.16em] mb-3"
+                style={{ color: '#247C78' }}
+              >
+                About the Clinic
+              </p>
+              <h2
+                className="text-3xl sm:text-4xl font-extrabold leading-tight mb-4"
+                style={{ color: '#123C3A', fontFamily: 'Manrope, sans-serif' }}
+              >
+                A More Comfortable Dental Experience
               </h2>
-              <p className="text-base text-slate-600 mt-2 leading-relaxed font-normal">
-                Dr. Sarah Mitchell believes that dental visits should be welcoming, comfortable, and centered on clear communication. This concept website demonstrates a modern dental practice workflow prioritizing patient comfort, digital smile planning, and gentle care procedures.
+              <p className="text-base leading-relaxed" style={{ color: '#667573' }}>
+                At Ivory Dental Studio, we believe dental visits should feel welcoming, not
+                stressful. Our approach centres on listening to your needs, explaining every
+                step clearly, and creating a calm environment where you feel looked after
+                from the moment you walk in.
               </p>
             </div>
 
-            {/* Key Qualifications (Sample Demo Wording) */}
-            <div className="space-y-2.5 bg-slate-50 p-4.5 rounded-2xl border border-slate-200/80">
-              <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider">
-                Sample Practice Philosophy & Features
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-medium text-slate-700">
-                <div className="flex items-center gap-2">
-                  <GraduationCap className="w-4 h-4 text-teal-600 flex-shrink-0" />
-                  <span>Comprehensive Oral Health Planning</span>
+            {/* Feature points */}
+            <div className="space-y-5">
+              {FEATURES.map(({ icon: Icon, title, description }) => (
+                <div key={title} className="flex items-start gap-4">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+                    style={{ background: '#EAF5F1' }}
+                  >
+                    <Icon className="w-5 h-5" style={{ color: '#247C78' }} aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3
+                      className="text-sm font-bold mb-1"
+                      style={{ color: '#123C3A', fontFamily: 'Manrope, sans-serif' }}
+                    >
+                      {title}
+                    </h3>
+                    <p className="text-sm leading-relaxed" style={{ color: '#667573' }}>
+                      {description}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-teal-600 flex-shrink-0" />
-                  <span>Cosmetic Dentistry & Veneers</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <HeartPulse className="w-4 h-4 text-teal-600 flex-shrink-0" />
-                  <span>Comfort-Oriented Treatment</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-teal-600 flex-shrink-0" />
-                  <span>Digital 3D Oral Scans</span>
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/* Doctor's Quote */}
-            <div className="p-4 rounded-2xl bg-teal-50/70 border-l-4 border-teal-600 text-slate-700 text-xs sm:text-sm italic">
-              "Our clinical goal is to combine modern technology with thoughtful, gentle care so every patient feels relaxed and supported."
-            </div>
-
-            {/* WhatsApp Contact Button */}
-            <div className="pt-1">
-              <a
-                href={DEMO_WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow-md transition-all"
-                aria-label="Inquire via WhatsApp Demo"
-              >
-                <MessageCircle className="w-4 h-4 fill-white" />
-                <span>Inquire On WhatsApp Demo</span>
-              </a>
-            </div>
-
+            {/* CTA */}
+            <button
+              onClick={onOpenBooking}
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-white font-bold text-sm transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 shadow-md"
+              style={{
+                background: 'linear-gradient(135deg, #123C3A 0%, #247C78 100%)',
+                fontFamily: 'Manrope, sans-serif',
+              }}
+              aria-label="Book a visit"
+            >
+              Book a Visit
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            </button>
           </div>
 
         </div>
-
       </div>
     </section>
   );

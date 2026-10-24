@@ -1,98 +1,115 @@
 import React from 'react';
-import { Star, ShieldCheck, Quote, ThumbsUp, Sparkles } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
-const REVIEWS = [
+/**
+ * Testimonials section — labelled as fictional sample content.
+ * Follows the "Your Experience Matters" approach per spec.
+ */
+const SAMPLE_TESTIMONIALS = [
   {
+    initials: 'SA',
     name: 'Sample Patient A',
-    treatment: 'Teeth Whitening (Demo)',
-    rating: 5,
-    date: 'Sample Review',
-    comment: 'The team made me feel completely comfortable. The laser whitening session was smooth and easy. Highly recommend their gentle approach!',
-    badge: 'Sample Review'
+    treatment: 'General Dentistry (Demo)',
+    quote:
+      'The team took time to explain everything clearly. The consultation felt unhurried and I left knowing exactly what to expect.',
   },
   {
-    name: 'Demo Reviewer B',
-    treatment: 'Porcelain Veneers (Demo)',
-    rating: 5,
-    date: 'Sample Review',
-    comment: 'Great attention to detail and clear communication during the smile makeover consultation. The digital scan preview was very helpful.',
-    badge: 'Sample Review'
+    initials: 'SB',
+    name: 'Sample Patient B',
+    treatment: 'Teeth Cleaning (Demo)',
+    quote:
+      'A genuinely comfortable visit. The clinic is clean, calm, and the staff are attentive without being rushed.',
   },
   {
-    name: 'Concept Patient C',
-    treatment: 'Invisalign Aligners (Demo)',
-    rating: 5,
-    date: 'Sample Review',
-    comment: 'Clear aligners process was explained thoroughly. Very modern clinic setup and friendly care coordination.',
-    badge: 'Sample Review'
+    initials: 'SC',
+    name: 'Sample Patient C',
+    treatment: 'Cosmetic Dentistry (Demo)',
+    quote:
+      'I appreciated the honest conversation about treatment options. No pressure — just clear information and helpful guidance.',
   },
-  {
-    name: 'Example Patient D',
-    treatment: 'Emergency Care (Demo)',
-    rating: 5,
-    date: 'Sample Review',
-    comment: 'Quick response for urgent tooth pain. Professional staff and comfortable care environment.',
-    badge: 'Sample Review'
-  }
 ];
 
 export default function Reviews() {
   return (
-    <section id="reviews" className="py-14 lg:py-20 bg-white border-y border-slate-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+    <section id="reviews" className="py-16 lg:py-24" style={{ background: 'white' }}>
+      <div className="container-site">
+
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-3 mb-12">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-100 text-teal-800">
-            <Sparkles className="w-3.5 h-3.5" /> Sample Testimonials • Demo Content
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Patient Feedback Example
-          </h2>
-          <p className="text-slate-600 text-base">
-            Illustrative testimonials demonstrating website testimonial layout and design.
+        <div className="max-w-2xl mx-auto text-center mb-14">
+          <p
+            className="text-xs font-bold uppercase tracking-[0.16em] mb-3"
+            style={{ color: '#247C78' }}
+          >
+            Patient Experience
           </p>
+          <h2
+            className="text-3xl sm:text-4xl font-extrabold leading-tight mb-4"
+            style={{ color: '#123C3A', fontFamily: 'Manrope, sans-serif' }}
+          >
+            Your Experience Matters
+          </h2>
+          <p className="text-base leading-relaxed mb-3" style={{ color: '#667573' }}>
+            At Ivory Dental Studio, every visit is designed around your comfort and
+            confidence. We listen, we explain, and we work at your pace.
+          </p>
+          <span
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full"
+            style={{ background: '#EAF5F1', color: '#247C78' }}
+          >
+            <Heart className="w-3 h-3" aria-hidden="true" />
+            Patient-First Approach
+          </span>
         </div>
 
-        {/* Reviews Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {REVIEWS.map((rev, idx) => (
-            <div key={idx} className="bg-slate-50 p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs relative flex flex-col justify-between">
-              <Quote className="absolute top-6 right-6 w-10 h-10 text-teal-200/40 pointer-events-none" />
-              
-              <div className="space-y-4">
-                <div className="flex items-center gap-1">
-                  {[...Array(rev.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
-                  <span className="text-xs text-slate-400 font-medium ml-2">{rev.date}</span>
+        {/* Sample testimonial cards */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {SAMPLE_TESTIMONIALS.map(({ initials, name, treatment, quote }) => (
+            <article
+              key={name}
+              className="p-6 rounded-2xl border relative"
+              style={{ background: '#FAF9F6', borderColor: '#EAF5F1' }}
+            >
+              {/* Fictional label */}
+              <span
+                className="absolute top-4 right-4 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
+                style={{ background: '#EAF5F1', color: '#667573' }}
+              >
+                Fictional Sample
+              </span>
+
+              {/* Quote */}
+              <p
+                className="text-sm leading-relaxed mb-5 pt-4"
+                style={{ color: '#667573' }}
+              >
+                "{quote}"
+              </p>
+
+              {/* Attribution */}
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-extrabold"
+                  style={{ background: '#EAF5F1', color: '#247C78' }}
+                  aria-hidden="true"
+                >
+                  {initials}
                 </div>
-
-                <p className="text-slate-700 text-sm sm:text-base leading-relaxed">
-                  "{rev.comment}"
-                </p>
-              </div>
-
-              <div className="pt-5 mt-4 border-t border-slate-200/70 flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
-                    <span>{rev.name}</span>
-                    <span className="text-[10px] bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <ShieldCheck className="w-3 h-3 text-teal-600" /> {rev.badge}
-                    </span>
-                  </div>
-                  <div className="text-xs text-teal-700 font-semibold mt-0.5">
-                    {rev.treatment}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-1 text-xs text-slate-400">
-                  <ThumbsUp className="w-3.5 h-3.5 text-teal-600" /> Helpful
+                  <p className="text-sm font-bold" style={{ color: '#123C3A', fontFamily: 'Manrope, sans-serif' }}>
+                    {name}
+                  </p>
+                  <p className="text-xs" style={{ color: '#247C78' }}>{treatment}</p>
                 </div>
               </div>
-            </div>
+            </article>
           ))}
         </div>
+
+        {/* Disclosure note */}
+        <p className="text-center text-xs mt-8" style={{ color: '#667573' }}>
+          The above are illustrative sample cards demonstrating testimonial layout.
+          They are not real patient reviews.
+        </p>
 
       </div>
     </section>

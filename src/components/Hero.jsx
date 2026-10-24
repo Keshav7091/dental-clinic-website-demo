@@ -1,147 +1,222 @@
 import React from 'react';
-import { Star, MessageCircle, Phone, Calendar, ShieldCheck, CheckCircle2, Sparkles } from 'lucide-react';
+import { Calendar, ArrowRight, CheckCircle2, Clock, MapPin } from 'lucide-react';
+import CLINIC_CONFIG from '../config';
+
+const TRUST_ITEMS = [
+  { icon: CheckCircle2, label: 'Personalised Care' },
+  { icon: CheckCircle2, label: 'Modern Equipment' },
+  { icon: CheckCircle2, label: 'Comfort-Focused Visits' },
+];
 
 export default function Hero({ onOpenBooking }) {
-  const DEMO_PHONE = "+15552345678";
-  const DEMO_WHATSAPP_URL = "https://wa.me/15552345678?text=Hi%20Dr.%20Sarah,%20I%20want%20to%20consult%20about%20dental%20care.";
+  const handleExploreServices = (e) => {
+    e.preventDefault();
+    const el = document.querySelector('#services');
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 76;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  };
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-teal-50/60 via-white to-slate-50 pt-8 pb-14 lg:pt-14 lg:pb-20">
-      
-      {/* Background Soft Glow */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[550px] h-[250px] bg-teal-300/20 blur-[100px] rounded-full pointer-events-none"></div>
+    <section
+      id="home"
+      className="pt-[76px] relative overflow-hidden"
+      style={{ background: 'linear-gradient(160deg, #EAF5F1 0%, #FAF9F6 55%, #FAF9F6 100%)' }}
+    >
+      {/* Subtle background accent */}
+      <div
+        className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full pointer-events-none opacity-40"
+        style={{
+          background: 'radial-gradient(circle, #C8E8E0 0%, transparent 70%)',
+          transform: 'translate(30%, -30%)',
+        }}
+        aria-hidden="true"
+      />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-          
-          {/* Left Hero Content */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-            
-            {/* Concept Demo Rating Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white shadow-xs border border-teal-200 text-xs font-semibold text-slate-800">
-              <div className="flex text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <span className="font-extrabold text-slate-900">Sample Rating</span>
-              <span className="text-slate-300">•</span>
-              <span className="text-teal-700 font-bold">Concept Website Demo</span>
-            </div>
+      <div className="container-site relative z-10">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center py-14 lg:py-20">
 
-            {/* Main Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-              Comfort-Focused Dental Care By <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">Dr. Sarah Mitchell</span>
-            </h1>
+          {/* Left: Content */}
+          <div className="space-y-6 text-center lg:text-left">
 
-            {/* Subtitle */}
-            <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-normal">
-              A concept dental clinic showcase designed around patient comfort, modern dental technology, cosmetic smile makeovers, and personalized treatment planning.
+            {/* Eyebrow */}
+            <p
+              className="inline-block text-xs font-bold uppercase tracking-[0.18em]"
+              style={{ color: '#247C78' }}
+            >
+              Your Smile, Our Priority
             </p>
 
-            {/* Checklist (Safe Demo Language) */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1 max-w-xl mx-auto lg:mx-0 text-left text-xs sm:text-sm font-semibold text-slate-700">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 flex-shrink-0" />
-                <span>Comfort-Focused Procedures</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 flex-shrink-0" />
-                <span>Modern Dental Technology</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-teal-600 flex-shrink-0" />
-                <span>Personalized Care Plan</span>
-              </div>
+            {/* H1 */}
+            <h1
+              className="text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold leading-[1.12] tracking-tight"
+              style={{ color: '#123C3A', fontFamily: 'Manrope, sans-serif' }}
+            >
+              Confident Smiles{' '}
+              <span className="block">Start With</span>
+              <span style={{ color: '#247C78' }}>Exceptional Care.</span>
+            </h1>
+
+            {/* Supporting text */}
+            <p
+              className="text-base sm:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0"
+              style={{ color: '#667573', fontFamily: 'Inter, sans-serif' }}
+            >
+              Discover thoughtful dental care in a comfortable, welcoming environment.
+              From routine checkups to smile-enhancing treatments, we're here to help
+              you smile with confidence.
+            </p>
+
+            {/* Trust indicators */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2">
+              {TRUST_ITEMS.map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-1.5">
+                  <Icon
+                    className="w-4 h-4 flex-shrink-0"
+                    style={{ color: '#247C78' }}
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="text-sm font-semibold"
+                    style={{ color: '#202D2C', fontFamily: 'Inter, sans-serif' }}
+                  >
+                    {label}
+                  </span>
+                </div>
+              ))}
             </div>
 
-            {/* Contact CTAs */}
-            <div className="pt-3 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
-              <a
-                href={DEMO_WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm sm:text-base shadow-md shadow-emerald-500/25 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
-                aria-label="Chat on WhatsApp"
-              >
-                <MessageCircle className="w-5 h-5 fill-white" />
-                <span>WhatsApp Demo</span>
-              </a>
-
-              <a
-                href={`tel:${DEMO_PHONE}`}
-                className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-sm sm:text-base shadow-md transition-all flex items-center justify-center gap-2"
-                aria-label="Call Demo Phone Number"
-              >
-                <Phone className="w-4 h-4 text-teal-400" />
-                <span>Call +1 (555) 234-5678</span>
-              </a>
-
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-1">
               <button
                 onClick={onOpenBooking}
-                className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 font-extrabold text-sm sm:text-base transition-colors flex items-center justify-center gap-2"
-                aria-label="Open Demo Booking Form"
+                className="w-full sm:w-auto px-7 py-3.5 rounded-xl text-white font-bold text-sm transition-all duration-200 hover:opacity-90 hover:-translate-y-0.5 shadow-lg flex items-center justify-center gap-2"
+                style={{
+                  background: 'linear-gradient(135deg, #123C3A 0%, #247C78 100%)',
+                  fontFamily: 'Manrope, sans-serif',
+                  boxShadow: '0 8px 24px rgba(18,60,58,0.25)',
+                }}
+                aria-label="Book an appointment"
               >
-                <Calendar className="w-4 h-4 text-teal-600" />
-                <span>Request Appointment</span>
+                <Calendar className="w-4 h-4" aria-hidden="true" />
+                Book an Appointment
               </button>
+
+              <a
+                href="#services"
+                onClick={handleExploreServices}
+                className="w-full sm:w-auto px-7 py-3.5 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 border-2"
+                style={{
+                  color: '#247C78',
+                  borderColor: '#247C78',
+                  background: 'transparent',
+                  fontFamily: 'Manrope, sans-serif',
+                }}
+                aria-label="Explore our services"
+              >
+                Explore Our Services
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </a>
             </div>
 
-            {/* Concept Footer Note */}
-            <div className="pt-3 flex items-center justify-center lg:justify-start gap-4 text-xs text-slate-500 font-medium">
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-teal-600" />
-                <span>Sample Credentials • Fictional Demo Clinic</span>
-              </div>
+            {/* Hours snippet */}
+            <div
+              className="inline-flex items-center gap-3 px-4 py-2.5 rounded-xl border text-xs font-medium"
+              style={{
+                borderColor: '#C8E8E0',
+                background: 'rgba(234,245,241,0.7)',
+                color: '#667573',
+              }}
+            >
+              <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#247C78' }} aria-hidden="true" />
+              <span>Mon – Sat: 9:00 AM – 7:00 PM</span>
+              <span style={{ color: '#C8E8E0' }}>|</span>
+              <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#247C78' }} aria-hidden="true" />
+              <span>{CLINIC_CONFIG.city}</span>
             </div>
-
           </div>
 
-          {/* Right Doctor Visual */}
-          <div className="lg:col-span-5 relative">
-            <div className="relative mx-auto max-w-md lg:max-w-none">
-              <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-slate-100">
-                <img
-                  src="/images/doctor-sarah.jpg"
-                  alt="Dr. Sarah Mitchell Lead Dentist"
-                  className="w-full h-[400px] sm:h-[460px] object-cover object-top"
-                  onError={(e) => {
-                    e.currentTarget.src = '/images/doctor-about.jpg';
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
-                
-                <div className="absolute bottom-5 left-5 right-5 text-white">
-                  <span className="px-2.5 py-0.5 rounded-md bg-teal-500 text-white font-extrabold text-[11px] uppercase tracking-wider">
-                    Lead Dentist • Demo Concept
-                  </span>
-                  <h3 className="text-xl font-bold mt-1">Dr. Sarah Mitchell, DDS</h3>
-                  <p className="text-xs text-slate-200 mt-0.5">Specialist in Comfortable Dental & Cosmetic Care</p>
+          {/* Right: Image */}
+          <div className="relative">
+            <div
+              className="relative rounded-3xl overflow-hidden shadow-2xl border-4"
+              style={{ borderColor: 'white' }}
+            >
+              <img
+                src="/images/hero-clinic.png"
+                alt="Modern dental treatment room at Ivory Dental Studio"
+                className="w-full h-[380px] sm:h-[460px] lg:h-[500px] object-cover"
+                onError={(e) => { e.currentTarget.src = '/images/clinic-hero.jpg'; }}
+                fetchPriority="high"
+              />
+              {/* Gradient overlay */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(to top, rgba(18,60,58,0.55) 0%, transparent 45%)',
+                }}
+                aria-hidden="true"
+              />
+              {/* Caption overlay */}
+              <div className="absolute bottom-5 left-5 right-5">
+                <p
+                  className="text-xs font-bold uppercase tracking-wider mb-1"
+                  style={{ color: 'rgba(234,245,241,0.9)' }}
+                >
+                  ✦ Demo Concept · Fictional Clinic
+                </p>
+                <p className="text-white font-bold text-lg leading-snug" style={{ fontFamily: 'Manrope, sans-serif' }}>
+                  Ivory Dental Studio
+                </p>
+                <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '13px' }}>
+                  Noida, Uttar Pradesh
+                </p>
+              </div>
+            </div>
+
+            {/* Floating badge — Personalized Care */}
+            <div
+              className="absolute -top-4 -left-4 hidden sm:flex items-center gap-3 p-3 rounded-2xl shadow-lg border"
+              style={{ background: 'white', borderColor: '#EAF5F1' }}
+              aria-hidden="true"
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-lg"
+                style={{ background: '#EAF5F1' }}
+              >
+                🌿
+              </div>
+              <div>
+                <div className="text-xs font-extrabold" style={{ color: '#123C3A', fontFamily: 'Manrope, sans-serif' }}>
+                  Patient-First
+                </div>
+                <div className="text-[10px] font-medium" style={{ color: '#667573' }}>
+                  Personalised Care
                 </div>
               </div>
+            </div>
 
-              {/* Stat Badge 1 */}
-              <div className="absolute -top-3 -left-4 bg-white p-3 rounded-2xl shadow-lg border border-slate-100 hidden sm:flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center font-bold text-base">
-                  ✨
+            {/* Floating badge — Open Hours */}
+            <div
+              className="absolute -bottom-4 -right-4 hidden sm:flex items-center gap-3 p-3 rounded-2xl shadow-lg border"
+              style={{ background: '#123C3A', borderColor: '#1C6360' }}
+              aria-hidden="true"
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ background: 'rgba(36,124,120,0.3)' }}
+              >
+                <Clock className="w-5 h-5" style={{ color: '#9FD3C8' }} />
+              </div>
+              <div>
+                <div className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  Open Today
                 </div>
-                <div>
-                  <div className="text-xs font-extrabold text-slate-900">Sample Portfolio</div>
-                  <div className="text-[10px] text-slate-500 font-semibold">Demo Practice Concept</div>
+                <div className="text-xs font-bold" style={{ color: '#9FD3C8', fontFamily: 'Manrope, sans-serif' }}>
+                  9 AM – 7 PM
                 </div>
               </div>
-
-              {/* Stat Badge 2 */}
-              <div className="absolute -bottom-3 -right-3 bg-slate-900 text-white p-3 rounded-2xl shadow-lg border border-slate-800 hidden sm:flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                  <MessageCircle className="w-4 h-4 fill-emerald-400 text-slate-900" />
-                </div>
-                <div>
-                  <div className="text-[10px] text-slate-400 font-medium">Demo Communication</div>
-                  <div className="text-xs font-bold text-emerald-400">WhatsApp Integration</div>
-                </div>
-              </div>
-
             </div>
           </div>
 

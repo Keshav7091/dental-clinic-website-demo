@@ -1,207 +1,202 @@
-import React, { useState } from 'react';
-import { MapPin, Phone, MessageCircle, Clock, Send, CheckCircle2, Sparkles } from 'lucide-react';
+import React from 'react';
+import { MapPin, Phone, Mail, Clock, AlertCircle } from 'lucide-react';
+import CLINIC_CONFIG from '../config';
 
 export default function ContactSection() {
-  const [formSent, setFormSent] = useState(false);
-  const [formData, setFormData] = useState({ name: '', phone: '', service: 'General Consultation', message: '' });
-
-  const DEMO_PHONE = "+15552345678";
-  const DEMO_WHATSAPP_URL = "https://wa.me/15552345678?text=Hi%20AuraDental,%20I%20want%20to%20send%20a%20demo%20inquiry.";
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setFormSent(true);
-  };
+  const { phone, phoneDisplay, email, emailDisplay, address, hours, mapEmbedUrl } = CLINIC_CONFIG;
 
   return (
-    <section id="contact" className="py-14 lg:py-20 bg-slate-900 text-white relative overflow-hidden">
-      
-      {/* Background Glow */}
-      <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-teal-500/10 blur-[140px] rounded-full pointer-events-none"></div>
+    <section id="contact" className="py-16 lg:py-24" style={{ background: '#123C3A' }}>
+      <div className="container-site">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        <div className="grid lg:grid-cols-12 gap-10 items-start">
-          
-          {/* Left Side: Contact Channels & Location */}
-          <div className="lg:col-span-5 space-y-7">
-            <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-500/20 text-teal-300 border border-teal-500/30">
-                <MapPin className="w-3.5 h-3.5" /> Sample Location & Channels
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-2.5">
-                Get In Touch (Demo)
-              </h2>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed">
-                Connect via WhatsApp or phone, or submit a sample consultation request through the contact form.
-              </p>
-            </div>
-
-            {/* Quick Contact Buttons */}
-            <div className="space-y-3">
-              <a
-                href={DEMO_WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full p-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-between"
-                aria-label="WhatsApp Demo Chat"
-              >
-                <div className="flex items-center gap-3">
-                  <MessageCircle className="w-5 h-5 fill-white" />
-                  <div className="text-left">
-                    <div>WhatsApp Demo Chat</div>
-                    <div className="text-[11px] text-emerald-100 font-normal">Click to test WhatsApp interaction</div>
-                  </div>
-                </div>
-                <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded font-semibold">Demo Link</span>
-              </a>
-
-              <a
-                href={`tel:${DEMO_PHONE}`}
-                className="w-full p-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-extrabold text-sm transition-all flex items-center justify-between"
-                aria-label="Call Demo Phone Number"
-              >
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-teal-400" />
-                  <div className="text-left">
-                    <div>Call +1 (555) 234-5678</div>
-                    <div className="text-[11px] text-slate-400 font-normal">Sample Reception Line</div>
-                  </div>
-                </div>
-                <span className="text-[10px] bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded font-semibold">Demo Call</span>
-              </a>
-            </div>
-
-            {/* Address & Hours */}
-            <div className="space-y-3 pt-1 text-xs sm:text-sm">
-              <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-teal-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-bold text-white text-xs sm:text-sm">Studio Address (Fictional)</h4>
-                  <p className="text-slate-300 text-xs mt-0.5">450 Aesthetic Way, Suite 200, Beverly Hills, CA 90210</p>
-                </div>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/80 flex items-start gap-3">
-                <Clock className="w-5 h-5 text-teal-400 flex-shrink-0 mt-0.5" />
-                <div className="w-full text-xs">
-                  <h4 className="font-bold text-white text-xs sm:text-sm mb-1">Sample Operating Hours</h4>
-                  <div className="grid grid-cols-2 text-slate-300 gap-1">
-                    <span>Monday - Friday:</span> <span className="font-bold text-right">9:00 AM - 7:00 PM</span>
-                    <span>Saturday:</span> <span className="font-bold text-right">9:00 AM - 5:00 PM</span>
-                    <span>Sunday:</span> <span className="text-slate-400 font-bold text-right">Closed</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Right Side: Quick Contact Form */}
-          <div className="lg:col-span-7 bg-white text-slate-900 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-5">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2 py-0.5 rounded">
-                Demo Form
-              </span>
-              <h3 className="text-2xl font-extrabold text-slate-900 mt-1">Sample Appointment Request Form</h3>
-              <p className="text-slate-600 text-xs sm:text-sm mt-1">
-                Test form fields and validation. No real data is transmitted.
-              </p>
-            </div>
-
-            {formSent ? (
-              <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-3 animate-fadeIn">
-                <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
-                <h4 className="text-lg font-bold text-slate-900">Demo request submitted successfully.</h4>
-                <p className="text-xs text-slate-600">
-                  Thank you for testing the contact form! Note: This is a concept website demo. No real message was sent to a live clinic.
-                </p>
-                <button
-                  onClick={() => setFormSent(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition-colors"
-                >
-                  Send Another Demo Request
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-3.5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div>
-                    <label htmlFor="contact-name" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Full Name *
-                    </label>
-                    <input
-                      id="contact-name"
-                      type="text"
-                      required
-                      placeholder="e.g. Alex Johnson"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full p-3 rounded-xl border border-slate-300 bg-slate-50 text-sm focus:bg-white focus:ring-2 focus:ring-teal-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="contact-phone" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                      Phone Number *
-                    </label>
-                    <input
-                      id="contact-phone"
-                      type="tel"
-                      required
-                      placeholder="(555) 000-0000"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full p-3 rounded-xl border border-slate-300 bg-slate-50 text-sm focus:bg-white focus:ring-2 focus:ring-teal-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="contact-service" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Treatment Interest
-                  </label>
-                  <select
-                    id="contact-service"
-                    value={formData.service}
-                    onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                    className="w-full p-3 rounded-xl border border-slate-300 bg-slate-50 text-sm font-medium focus:bg-white focus:ring-2 focus:ring-teal-500"
-                  >
-                    <option value="General Consultation">General Consultation</option>
-                    <option value="Teeth Whitening">Teeth Whitening</option>
-                    <option value="Veneers">Porcelain Veneers</option>
-                    <option value="Invisalign">Invisalign Aligners</option>
-                    <option value="Dental Implants">Dental Implants</option>
-                    <option value="Root Canal Care">Root Canal Care</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="contact-message" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Message or Notes (Optional)
-                  </label>
-                  <textarea
-                    id="contact-message"
-                    rows="3"
-                    placeholder="Enter any sample message or notes..."
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full p-3 rounded-xl border border-slate-300 bg-slate-50 text-sm focus:bg-white focus:ring-2 focus:ring-teal-500"
-                  ></textarea>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm shadow-md shadow-teal-600/20 transition-all flex items-center justify-center gap-2"
-                >
-                  <Send className="w-4 h-4" /> Submit Demo Request
-                </button>
-              </form>
-            )}
-          </div>
-
+        {/* Header */}
+        <div className="max-w-2xl mx-auto text-center mb-14">
+          <p
+            className="text-xs font-bold uppercase tracking-[0.16em] mb-3"
+            style={{ color: '#9FD3C8' }}
+          >
+            Get in Touch
+          </p>
+          <h2
+            className="text-3xl sm:text-4xl font-extrabold leading-tight mb-4 text-white"
+            style={{ fontFamily: 'Manrope, sans-serif' }}
+          >
+            Visit Our Clinic
+          </h2>
+          <p className="text-base leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
+            Use the details below to plan your visit or send an enquiry. All contact
+            information shown here is a placeholder for this portfolio demo.
+          </p>
         </div>
 
+        <div className="grid lg:grid-cols-2 gap-10 items-start">
+
+          {/* Left: Contact details */}
+          <div className="space-y-5">
+
+            {/* Address */}
+            <div
+              className="flex items-start gap-4 p-5 rounded-2xl"
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(36,124,120,0.3)' }}
+              >
+                <MapPin className="w-5 h-5" style={{ color: '#9FD3C8' }} aria-hidden="true" />
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#9FD3C8' }}>
+                  Address (Placeholder)
+                </p>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  {address}
+                </p>
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div
+              className="flex items-start gap-4 p-5 rounded-2xl"
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(36,124,120,0.3)' }}
+              >
+                <Phone className="w-5 h-5" style={{ color: '#9FD3C8' }} aria-hidden="true" />
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#9FD3C8' }}>
+                  Phone (Placeholder)
+                </p>
+                {phone ? (
+                  <a
+                    href={`tel:${phone}`}
+                    className="text-sm hover:underline"
+                    style={{ color: 'rgba(255,255,255,0.8)' }}
+                  >
+                    {phoneDisplay}
+                  </a>
+                ) : (
+                  <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    {phoneDisplay}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Email */}
+            <div
+              className="flex items-start gap-4 p-5 rounded-2xl"
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}
+            >
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(36,124,120,0.3)' }}
+              >
+                <Mail className="w-5 h-5" style={{ color: '#9FD3C8' }} aria-hidden="true" />
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#9FD3C8' }}>
+                  Email (Placeholder)
+                </p>
+                {email ? (
+                  <a
+                    href={`mailto:${email}`}
+                    className="text-sm hover:underline"
+                    style={{ color: 'rgba(255,255,255,0.8)' }}
+                  >
+                    {emailDisplay}
+                  </a>
+                ) : (
+                  <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    {emailDisplay}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Hours */}
+            <div
+              className="p-5 rounded-2xl"
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(36,124,120,0.3)' }}
+                >
+                  <Clock className="w-5 h-5" style={{ color: '#9FD3C8' }} aria-hidden="true" />
+                </div>
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#9FD3C8' }}>
+                  Opening Hours (Placeholder)
+                </p>
+              </div>
+              <dl className="space-y-1.5 ml-1">
+                {hours.map(({ days, time }) => (
+                  <div key={days} className="flex justify-between text-sm gap-4">
+                    <dt style={{ color: 'rgba(255,255,255,0.6)' }}>{days}</dt>
+                    <dd className="font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>{time}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+
+          {/* Right: Map placeholder */}
+          <div>
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                height: '380px',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+              }}
+            >
+              {mapEmbedUrl ? (
+                <iframe
+                  src={mapEmbedUrl}
+                  title="Clinic location map"
+                  className="w-full h-full"
+                  loading="lazy"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  style={{ border: 'none' }}
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-4 p-8 text-center">
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                    style={{ background: 'rgba(36,124,120,0.25)' }}
+                  >
+                    <MapPin className="w-7 h-7" style={{ color: '#9FD3C8' }} aria-hidden="true" />
+                  </div>
+                  <div>
+                    <p
+                      className="font-bold text-base mb-2"
+                      style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Manrope, sans-serif' }}
+                    >
+                      Map Placeholder
+                    </p>
+                    <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                      Replace <code className="text-xs" style={{ color: '#9FD3C8' }}>mapEmbedUrl</code> in{' '}
+                      <code className="text-xs" style={{ color: '#9FD3C8' }}>src/config.js</code>{' '}
+                      with a Google Maps embed URL to display the clinic location.
+                    </p>
+                  </div>
+                  <div
+                    className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg"
+                    style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }}
+                  >
+                    <AlertCircle className="w-3.5 h-3.5" aria-hidden="true" />
+                    Portfolio demo — no real address configured
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -1,62 +1,118 @@
 @import "tailwindcss";
 
 @theme {
-  --color-teal-50: #f0fdfa;
-  --color-teal-100: #ccfbf1;
-  --color-teal-200: #99f6e4;
-  --color-teal-300: #5eead4;
-  --color-teal-400: #2dd4bf;
-  --color-teal-500: #14b8a6;
-  --color-teal-600: #0d9488;
-  --color-teal-700: #0f766e;
-  --color-teal-800: #115e59;
-  --color-teal-900: #134e4a;
-  --color-teal-950: #042f2e;
+  /* Brand palette — Ivory Dental Studio */
+  --color-brand-dark:   #123C3A;
+  --color-brand-teal:   #247C78;
+  --color-brand-mint:   #EAF5F1;
+  --color-brand-cream:  #FAF9F6;
+  --color-brand-text:   #202D2C;
+  --color-brand-muted:  #667573;
 
-  --color-cyan-500: #06b6d4;
-  --color-cyan-600: #0891b2;
-  --color-cyan-700: #0e7490;
+  /* Extended teal scale */
+  --color-teal-50:  #EAF5F1;
+  --color-teal-100: #C8E8E0;
+  --color-teal-200: #9FD3C8;
+  --color-teal-300: #70BBAD;
+  --color-teal-400: #47A194;
+  --color-teal-500: #247C78;
+  --color-teal-600: #1C6360;
+  --color-teal-700: #154A47;
+  --color-teal-800: #0E3230;
+  --color-teal-900: #123C3A;
+  --color-teal-950: #091F1E;
 
-  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  /* Font families */
+  --font-display: 'Manrope', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-sans:    'Inter', system-ui, sans-serif;
 }
 
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #202D2C;
+  background-color: #FAF9F6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Manrope', system-ui, sans-serif;
+}
+
+/* Animations */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-8px); }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.98); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-float {
-  animation: float 4s ease-in-out infinite;
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Custom Glassmorphism */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+.animate-float    { animation: float 4s ease-in-out infinite; }
+.animate-fadeIn   { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slideIn  { animation: slideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slideDown { animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #EAF5F1; }
+::-webkit-scrollbar-thumb { background: #247C78; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #123C3A; }
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid #247C78;
+  outline-offset: 2px;
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #0d9488;
+
+/* Utility classes */
+.container-site {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-site {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-site {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }

@@ -1,104 +1,259 @@
 import React from 'react';
-import { Calendar, ShieldCheck, Sparkles, MessageCircle, Phone } from 'lucide-react';
+import { Calendar, MapPin, Phone, Mail, ArrowUp } from 'lucide-react';
+import CLINIC_CONFIG from '../config';
 
-export default function Footer({ onOpenBooking }) {
-  const DEMO_PHONE = "+15552345678";
-  const DEMO_WHATSAPP_URL = "https://wa.me/15552345678?text=Hi%20AuraDental,%20I%20want%20to%20ask%20a%20question.";
+const QUICK_LINKS = [
+  { label: 'Home',       href: '#home' },
+  { label: 'Services',   href: '#services' },
+  { label: 'Our Team',   href: '#team' },
+  { label: 'About',      href: '#about' },
+  { label: 'Contact',    href: '#contact' },
+  { label: 'FAQs',       href: '#faq' },
+];
+
+const SERVICES_LINKS = [
+  'General Dentistry',
+  'Teeth Cleaning',
+  'Cosmetic Dentistry',
+  'Root Canal Treatment',
+  'Braces & Alignment',
+  'Pediatric Dentistry',
+];
+
+function scrollTo(href) {
+  const el = document.querySelector(href);
+  if (el) {
+    const top = el.getBoundingClientRect().top + window.scrollY - 76;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }
+}
+
+export default function Footer({ onOpenBooking, onOpenDoctorPortal }) {
+  const { phone, phoneDisplay, email, emailDisplay, address, social } = CLINIC_CONFIG;
 
   return (
-    <footer className="bg-slate-950 text-slate-400 text-sm border-t border-slate-800">
-      
-      {/* Top CTA Strip */}
-      <div className="bg-gradient-to-r from-teal-950 via-slate-900 to-teal-950 py-8 px-4 text-white border-b border-slate-800">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+    <footer style={{ background: '#091F1E', color: 'rgba(255,255,255,0.6)' }}>
+
+      {/* CTA Strip */}
+      <div
+        className="border-b"
+        style={{ borderColor: 'rgba(255,255,255,0.07)', background: '#0E3230' }}
+      >
+        <div className="container-site py-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
           <div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-teal-500/20 text-teal-300 text-xs font-bold border border-teal-500/30 mb-1">
-              <Sparkles className="w-3 h-3 text-teal-400" /> Concept Website Demo
-            </span>
-            <h3 className="text-xl sm:text-2xl font-extrabold text-white">Experience A Modern Dental Website Workflow</h3>
-            <p className="text-slate-300 text-xs sm:text-sm mt-0.5">Explore treatment options, sample patient reviews, and instant WhatsApp communication.</p>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <a
-              href={DEMO_WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-1.5"
-              aria-label="WhatsApp Demo Link"
+            <h3
+              className="text-xl sm:text-2xl font-extrabold text-white mb-1"
+              style={{ fontFamily: 'Manrope, sans-serif' }}
             >
-              <MessageCircle className="w-4 h-4 fill-white" /> WhatsApp
-            </a>
-            <button
-              onClick={onOpenBooking}
-              className="px-5 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-1.5"
-              aria-label="Demo Booking Form Link"
-            >
-              <Calendar className="w-4 h-4" /> Request Appointment
-            </button>
+              Ready to Book Your Visit?
+            </h3>
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              Fill in our enquiry form and we'll get back to you promptly.
+            </p>
           </div>
+          <button
+            onClick={onOpenBooking}
+            className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 hover:opacity-90 shadow-md flex-shrink-0"
+            style={{
+              background: 'linear-gradient(135deg, #247C78 0%, #123C3A 100%)',
+              fontFamily: 'Manrope, sans-serif',
+            }}
+            aria-label="Book an appointment"
+          >
+            <Calendar className="w-4 h-4" aria-hidden="true" />
+            Book Appointment
+          </button>
         </div>
       </div>
 
-      {/* Main Footer Links */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
-        
+      {/* Main footer grid */}
+      <div className="container-site py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
         {/* Brand */}
-        <div className="space-y-3 md:col-span-1">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-teal-500 text-slate-950 font-bold flex items-center justify-center text-base">
+        <div className="space-y-4 sm:col-span-2 lg:col-span-1">
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-lg font-bold"
+              style={{ background: 'linear-gradient(135deg, #247C78 0%, #154A47 100%)' }}
+            >
               🦷
             </div>
-            <span className="text-base font-bold text-white tracking-tight">
-              Aura<span className="text-teal-400">Dental</span>
-            </span>
-          </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            AuraDental Studio is a fictional concept website demo created to demonstrate dental practice lead conversion UI.
-          </p>
-          <div className="text-[11px] text-slate-500">
-            © {new Date().getFullYear()} AuraDental Studio Demo. All rights reserved.
-          </div>
-        </div>
-
-        {/* Treatments */}
-        <div>
-          <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-3">Sample Treatments</h4>
-          <ul className="space-y-1.5 text-xs">
-            <li><a href="#treatments" className="hover:text-teal-400 transition-colors">Laser Teeth Whitening</a></li>
-            <li><a href="#treatments" className="hover:text-teal-400 transition-colors">Porcelain Veneers</a></li>
-            <li><a href="#treatments" className="hover:text-teal-400 transition-colors">Invisalign Clear Aligners</a></li>
-            <li><a href="#treatments" className="hover:text-teal-400 transition-colors">3D Dental Implants</a></li>
-            <li><a href="#treatments" className="hover:text-teal-400 transition-colors">Comfort Root Canal Care</a></li>
-          </ul>
-        </div>
-
-        {/* Links */}
-        <div>
-          <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-3">Concept Navigation</h4>
-          <ul className="space-y-1.5 text-xs">
-            <li><a href="#about-doctor" className="hover:text-teal-400 transition-colors">About Dr. Sarah Mitchell</a></li>
-            <li><a href="#treatments" className="hover:text-teal-400 transition-colors">Treatments Overview</a></li>
-            <li><a href="#reviews" className="hover:text-teal-400 transition-colors">Sample Reviews</a></li>
-            <li><a href="#contact" className="hover:text-teal-400 transition-colors">Location & Contact</a></li>
-          </ul>
-        </div>
-
-        {/* Contact Info */}
-        <div>
-          <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-3">Demo Contact Channels</h4>
-          <div className="space-y-2 text-xs text-slate-400">
-            <p><strong className="text-slate-200">Demo Phone:</strong> <a href={`tel:${DEMO_PHONE}`} className="hover:text-teal-400">+1 (555) 234-5678</a></p>
-            <p><strong className="text-slate-200">WhatsApp:</strong> <a href={DEMO_WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400">WhatsApp Demo Link</a></p>
-            <p><strong className="text-slate-200">Location:</strong> Beverly Hills, CA (Sample)</p>
-            <div className="pt-2 flex items-center gap-1 text-[11px] text-teal-400 font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" /> Concept Portfolio Project
+            <div className="leading-tight">
+              <span
+                className="text-base font-extrabold text-white tracking-tight"
+                style={{ fontFamily: 'Manrope, sans-serif' }}
+              >
+                Ivory <span style={{ color: '#70BBAD' }}>Dental</span>
+              </span>
+              <span
+                className="block text-[9px] font-semibold uppercase tracking-widest"
+                style={{ color: '#667573' }}
+              >
+                Studio
+              </span>
             </div>
           </div>
+          <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            Ivory Dental Studio is a fictional brand created for a freelance
+            portfolio demonstration. All clinic details are placeholders.
+          </p>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            © {new Date().getFullYear()} Ivory Dental Studio Demo.
+          </p>
         </div>
 
+        {/* Quick links */}
+        <div>
+          <h4
+            className="text-xs font-bold uppercase tracking-wider mb-4 text-white"
+          >
+            Navigation
+          </h4>
+          <ul className="space-y-2.5">
+            {QUICK_LINKS.map(({ label, href }) => (
+              <li key={href}>
+                <a
+                  href={href}
+                  onClick={(e) => { e.preventDefault(); scrollTo(href); }}
+                  className="text-xs transition-colors duration-200 hover:text-white"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+            <li className="pt-1.5">
+              <button
+                onClick={onOpenDoctorPortal}
+                className="text-xs font-semibold text-teal-400 hover:text-teal-200 transition-colors flex items-center gap-1.5"
+              >
+                <span>👨‍⚕️</span> Doctor Portal
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Services */}
+        <div>
+          <h4 className="text-xs font-bold uppercase tracking-wider mb-4 text-white">
+            Services
+          </h4>
+          <ul className="space-y-2.5">
+            {SERVICES_LINKS.map((s) => (
+              <li key={s}>
+                <a
+                  href="#services"
+                  onClick={(e) => { e.preventDefault(); scrollTo('#services'); }}
+                  className="text-xs transition-colors duration-200 hover:text-white"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
+                >
+                  {s}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Contact */}
+        <div>
+          <h4 className="text-xs font-bold uppercase tracking-wider mb-4 text-white">
+            Contact
+          </h4>
+          <ul className="space-y-3.5">
+            <li className="flex items-start gap-2.5">
+              <MapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: '#70BBAD' }} aria-hidden="true" />
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                {address}
+              </span>
+            </li>
+            <li className="flex items-center gap-2.5">
+              <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#70BBAD' }} aria-hidden="true" />
+              {phone ? (
+                <a
+                  href={`tel:${phone}`}
+                  className="text-xs hover:text-white transition-colors"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
+                >
+                  {phoneDisplay}
+                </a>
+              ) : (
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  {phoneDisplay}
+                </span>
+              )}
+            </li>
+            <li className="flex items-center gap-2.5">
+              <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#70BBAD' }} aria-hidden="true" />
+              {email ? (
+                <a
+                  href={`mailto:${email}`}
+                  className="text-xs hover:text-white transition-colors"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
+                >
+                  {emailDisplay}
+                </a>
+              ) : (
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  {emailDisplay}
+                </span>
+              )}
+            </li>
+          </ul>
+
+          {/* Social — only rendered if configured */}
+          {(social?.instagram || social?.facebook || social?.twitter) && (
+            <div className="mt-5 flex gap-3">
+              {social.instagram && (
+                <a
+                  href={social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="text-xs hover:text-white transition-colors"
+                  style={{ color: 'rgba(255,255,255,0.45)' }}
+                >
+                  Instagram
+                </a>
+              )}
+              {social.facebook && (
+                <a
+                  href={social.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="text-xs hover:text-white transition-colors"
+                  style={{ color: 'rgba(255,255,255,0.45)' }}
+                >
+                  Facebook
+                </a>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* Bottom bar */}
+      <div
+        className="border-t"
+        style={{ borderColor: 'rgba(255,255,255,0.06)' }}
+      >
+        <div className="container-site py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            This website is a portfolio demonstration. All clinic names, profiles, and
+            contact details are fictional. Do not attempt to contact the clinic using
+            the placeholder information shown.
+          </p>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-1.5 text-[11px] font-semibold flex-shrink-0 transition-colors duration-200 hover:text-white"
+            style={{ color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}
+            aria-label="Back to top"
+          >
+            <ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />
+            Back to top
+          </button>
+        </div>
+      </div>
     </footer>
   );
 }

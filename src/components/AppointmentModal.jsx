@@ -1,334 +1,678 @@
-import React, { useState } from 'react';
-import { X, Calendar, CheckCircle2, ShieldCheck, ArrowRight, ArrowLeft } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { X, CheckCircle2, ArrowRight, ArrowLeft, ShieldCheck, AlertCircle, Clock } from 'lucide-react';
+import CLINIC_CONFIG from '../config';
+import { saveAppointment } from '../utils/appointmentStorage';
 
-const DOCTORS_LIST = [
-  { id: 'sarah', name: 'Dr. Sarah Mitchell, DDS', title: 'Lead Dentist (Sample Profile)' },
-  { id: 'any', name: 'First Available Associate', title: 'Sample Clinic Schedule' },
+const SERVICES_LIST = [
+  'General Dentistry',
+  'Teeth Cleaning',
+  'Cosmetic Dentistry',
+  'Root Canal Treatment',
+  'Braces & Alignment',
+  'Pediatric Dentistry',
+  'Other / Not Sure',
 ];
 
-const TIME_SLOTS = [
-  { time: '09:30 AM', period: 'Morning' },
-  { time: '11:00 AM', period: 'Morning' },
-  { time: '02:00 PM', period: 'Afternoon' },
-  { time: '04:30 PM', period: 'Afternoon' },
+const TIME_OPTIONS = [
+  '09:00 AM', '10:00 AM', '11:00 AM',
+  '12:00 PM', '02:00 PM', '03:00 PM',
+  '04:00 PM', '05:00 PM', '06:00 PM',
 ];
 
+const getTomorrow = () => {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+};
+
+const TODAY = new Date().toISOString().split('T')[0];
+
+function FieldError({ message }) {
+  if (!message) return null;
+  return (
+    <p role="alert" className="text-xs mt-1 font-medium" style={{ color: '#DC2626' }}>
+      {message}
+    </p>
+  );
+}
+
+/**
+ * AppointmentModal — Real appointment enquiry form.
+ * Dispatches full booking details & exact booking timestamp to clinic email.
+ */
 export default function AppointmentModal({ isOpen, onClose, initialService = '' }) {
   const [step, setStep] = useState(1);
-  const [service, setService] = useState(initialService || 'Laser Teeth Whitening');
-  const [doctor, setDoctor] = useState(DOCTORS_LIST[0]);
-  const [date, setDate] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
-  });
-  const [slot, setSlot] = useState('11:00 AM');
-  
-  // Patient details form
-  const [patientInfo, setPatientInfo] = useState({
-    fullName: '',
-    phone: '',
-    email: '',
-    notes: '',
-  });
 
-  const [bookingRef, setBookingRef] = useState('');
+  // Step 1 fields
+  const [service, setService] = useState('');
+  const [prefDate, setPrefDate] = useState(getTomorrow());
+  const [prefTime, setPrefTime] = useState('10:00 AM');
+
+  // Step 2 fields
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [consent, setConsent] = useState(false);
+
+  // Errors & submission state
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [demoRef, setDemoRef] = useState('');
+  const [bookingTime, setBookingTime] = useState('');
+
+  const modalRef = useRef(null);
+  const firstFocusRef = useRef(null);
+
+  const recipientEmail = CLINIC_CONFIG.appointmentNotification?.recipientEmail || 'keshavk1002003@gmail.com';
+
+  // Sync initial service
+  useEffect(() => {
+    if (isOpen) {
+      setService(initialService || SERVICES_LIST[0]);
+      setStep(1);
+      setErrors({});
+      setSubmitted(false);
+      setFullName(''); setPhone(''); setEmail('');
+      setMessage(''); setConsent(false);
+      setBookingTime('');
+    }
+  }, [isOpen, initialService]);
+
+  // Trap focus
+  useEffect(() => {
+    if (isOpen && firstFocusRef.current) {
+      firstFocusRef.current.focus();
+    }
+  }, [isOpen, step]);
+
+  // Close on Escape
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    if (isOpen) document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
-  const handleNextStep = () => {
-    if (step === 3) {
-      const ref = 'DEMO-' + Math.floor(100000 + Math.random() * 900000);
-      setBookingRef(ref);
-      setStep(4);
-    } else {
-      setStep(step + 1);
+  // --- Validation ---
+  const validateStep1 = () => {
+    const e = {};
+    if (!service) e.service = 'Please select a service.';
+    if (!prefDate) e.prefDate = 'Please choose a preferred date.';
+    return e;
+  };
+
+  const validateStep2 = () => {
+    const e = {};
+    if (!fullName.trim()) e.fullName = 'Full name is required.';
+    if (!phone.trim()) {
+      e.phone = 'Phone number is required.';
+    } else if (!/^[\d\s+\-()]{7,15}$/.test(phone.trim())) {
+      e.phone = 'Please enter a valid phone number.';
+    }
+    if (!email.trim()) {
+      e.email = 'Email is required so Dr. Keshav can send your appointment confirmation.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      e.email = 'Please enter a valid email address.';
+    }
+    if (!consent) e.consent = 'Please accept the privacy notice to continue.';
+    return e;
+  };
+
+  const handleNext = () => {
+    const errs = validateStep1();
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+    setErrors({});
+    setStep(2);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errs = validateStep2();
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+    setErrors({});
+    setSubmitting(true);
+
+    const ref = 'IDS-' + Math.floor(100000 + Math.random() * 900000);
+    const now = new Date();
+    const formattedBookingTime = now.toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      dateStyle: 'full',
+      timeStyle: 'medium',
+    });
+
+    // Save locally for Doctor Portal
+    saveAppointment({
+      ref,
+      fullName: fullName.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
+      service,
+      prefDate,
+      prefTime,
+      message: message.trim(),
+      submittedAt: formattedBookingTime,
+      status: 'pending',
+    });
+
+    // Generate direct Doctor Action links that Dr. Keshav can click inside his Gmail
+    const origin = window.location.origin;
+    const confirmUrl = `${origin}?action=confirm&ref=${ref}&name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(email)}&service=${encodeURIComponent(service)}&date=${encodeURIComponent(prefDate)}&time=${encodeURIComponent(prefTime)}&phone=${encodeURIComponent(phone)}`;
+    const rejectUrl = `${origin}?action=reject&ref=${ref}&name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(email)}&service=${encodeURIComponent(service)}&date=${encodeURIComponent(prefDate)}&time=${encodeURIComponent(prefTime)}&phone=${encodeURIComponent(phone)}`;
+    const doctorPortalUrl = `${origin}#doctor`;
+
+    try {
+      const provider = CLINIC_CONFIG.appointmentNotification?.provider || 'formsubmit';
+      const web3Key = CLINIC_CONFIG.appointmentNotification?.web3formsAccessKey;
+
+      if (provider === 'web3forms' && web3Key) {
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            access_key: web3Key,
+            subject: `New Patient Booking: ${fullName} - ${prefDate} (${prefTime})`,
+            from_name: 'Ivory Dental Clinic Website',
+            'Booking Reference': ref,
+            'Patient Name': fullName,
+            'Phone Number': phone,
+            'Patient Email': email,
+            'Service Requested': service,
+            'Preferred Appointment Date': prefDate,
+            'Preferred Time Slot': prefTime,
+            'Additional Notes': message || 'None',
+            'Booked At (Time)': formattedBookingTime,
+            '⚡ CONFIRM APPOINTMENT': confirmUrl,
+            '❌ REJECT APPOINTMENT': rejectUrl,
+            '👨‍⚕️ DOCTOR DASHBOARD': doctorPortalUrl,
+          }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.success === false) {
+          throw new Error(data.message || 'Failed to submit appointment to Web3Forms');
+        }
+      } else {
+        // FormSubmit AJAX API — Sends directly to Dr. Keshav (keshavk1002003@gmail.com)
+        const response = await fetch(`https://formsubmit.co/ajax/${recipientEmail}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            _subject: `New Patient Booking: ${fullName} - ${prefDate} (${prefTime})`,
+            _template: 'table',
+            _captcha: 'false',
+            'Booking Reference': ref,
+            'Patient Name': fullName,
+            'Phone Number': phone,
+            'Patient Email': email,
+            'Service Requested': service,
+            'Preferred Appointment Date': prefDate,
+            'Preferred Time Slot': prefTime,
+            'Patient Notes': message || 'None',
+            'Booked At': formattedBookingTime,
+            '⚡ CONFIRM APPOINTMENT (Click to Send Email to Patient)': confirmUrl,
+            '❌ REJECT APPOINTMENT (Click to Notify Patient)': rejectUrl,
+            '👨‍⚕️ DOCTOR PORTAL': doctorPortalUrl,
+          }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok && data.success !== 'true' && data.success !== true) {
+          throw new Error(data.message || 'Failed to submit appointment request');
+        }
+      }
+
+      setDemoRef(ref);
+      setBookingTime(formattedBookingTime);
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Email sending error:', err);
+      setErrors({
+        submit: 'Could not send the email notification automatically. Please check your connection or contact us directly.',
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handlePrevStep = () => {
-    if (step > 1) setStep(step - 1);
-  };
-
-  const resetAndClose = () => {
-    setStep(1);
-    onClose();
-  };
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl border border-slate-200 flex flex-col max-h-[92vh]">
-        
-        {/* Modal Header */}
-        <div className="bg-slate-900 text-white p-5 relative flex items-center justify-between">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(18,60,58,0.6)', backdropFilter: 'blur(6px)' }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        ref={modalRef}
+        className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl flex flex-col animate-fadeIn max-h-[92vh]"
+        style={{ background: 'white' }}
+      >
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-6 py-5"
+          style={{ background: '#123C3A', color: 'white' }}
+        >
           <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-teal-400">
-                {step === 4 ? 'Demo Appointment Submitted' : `Step ${step} of 3 • Concept Booking Wizard`}
-              </span>
-            </div>
-            <h3 className="text-xl font-bold mt-0.5 text-white">
-              {step === 4 ? 'Demo Request Summary' : 'Request A Consultation'}
-            </h3>
+            {!submitted && (
+              <p className="text-xs font-bold uppercase tracking-wider mb-0.5" style={{ color: '#9FD3C8' }}>
+                Step {step} of 2 · Appointment Request
+              </p>
+            )}
+            <h2
+              id="modal-title"
+              className="text-lg font-extrabold"
+              style={{ fontFamily: 'Manrope, sans-serif' }}
+            >
+              {submitted ? 'Appointment Request Confirmed' : "Let's Plan Your Next Visit"}
+            </h2>
           </div>
-
           <button
-            onClick={resetAndClose}
-            aria-label="Close modal"
-            className="w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 flex items-center justify-center transition-colors"
+            onClick={onClose}
+            aria-label="Close appointment form"
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200"
+            style={{ background: 'rgba(255,255,255,0.15)', color: 'white' }}
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Progress Bar */}
-        {step <= 3 && (
-          <div className="w-full bg-slate-100 h-1 flex">
-            <div 
-              className="bg-gradient-to-r from-teal-500 to-cyan-500 h-full transition-all duration-300"
-              style={{ width: `${(step / 3) * 100}%` }}
-            ></div>
+        {/* Progress bar */}
+        {!submitted && (
+          <div className="h-1" style={{ background: '#EAF5F1' }}>
+            <div
+              className="h-full transition-all duration-400"
+              style={{ width: `${(step / 2) * 100}%`, background: '#247C78' }}
+            />
           </div>
         )}
 
-        {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-5 flex-1">
-          
-          {/* STEP 1 */}
-          {step === 1 && (
-            <div className="space-y-4 animate-fadeIn">
-              <div>
-                <label htmlFor="modal-service" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Select Treatment / Service
-                </label>
-                <select
-                  id="modal-service"
-                  value={service}
-                  onChange={(e) => setService(e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 font-medium text-sm focus:ring-2 focus:ring-teal-500"
-                >
-                  <option value="Laser Teeth Whitening">Laser Teeth Whitening (Sample Price: $299)</option>
-                  <option value="Invisalign Clear Aligners">Invisalign® Clear Aligners (Sample Price: $2,400)</option>
-                  <option value="3D Dental Implant">3D Dental Implant (Sample Price: $1,200/tooth)</option>
-                  <option value="Porcelain Veneers">Porcelain Veneers (Sample Price: $850/tooth)</option>
-                  <option value="Checkup & Hygiene Cleaning">Checkup & Hygiene Cleaning (Sample Price: $149)</option>
-                  <option value="Comfort Root Canal Care">Comfort Root Canal Care (Sample Price: $650)</option>
-                </select>
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-6">
+
+          {/* SUCCESS STATE */}
+          {submitted && (
+            <div className="text-center space-y-5 py-3 animate-fadeIn">
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
+                style={{ background: '#EAF5F1' }}
+              >
+                <CheckCircle2 className="w-9 h-9" style={{ color: '#247C78' }} />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Select Preferred Doctor
-                </label>
-                <div className="space-y-2">
-                  {DOCTORS_LIST.map((doc) => (
-                    <button
-                      key={doc.id}
-                      type="button"
-                      onClick={() => setDoctor(doc)}
-                      className={`w-full p-3 rounded-xl text-left border flex items-center justify-between transition-all ${
-                        doctor.id === doc.id
-                          ? 'border-teal-600 bg-teal-50/70 shadow-2xs'
-                          : 'border-slate-200 hover:border-slate-300 bg-white'
-                      }`}
-                    >
-                      <div>
-                        <div className="font-bold text-slate-900 text-xs sm:text-sm">{doc.name}</div>
-                        <div className="text-[11px] text-slate-500">{doc.title}</div>
-                      </div>
-                      {doctor.id === doc.id && (
-                        <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                      )}
-                    </button>
-                  ))}
+                <span
+                  className="inline-block text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-2"
+                  style={{ background: '#EAF5F1', color: '#247C78' }}
+                >
+                  Reference: {demoRef}
+                </span>
+                <h3
+                  className="text-xl font-extrabold mb-2"
+                  style={{ color: '#123C3A', fontFamily: 'Manrope, sans-serif' }}
+                >
+                  Appointment Request Sent to Dr. Keshav!
+                </h3>
+                <p className="text-sm leading-relaxed" style={{ color: '#667573' }}>
+                  Your appointment booking details and exact timestamp have been delivered to Dr. Keshav at{' '}
+                  <strong className="text-neutral-800">{recipientEmail}</strong>. Once Dr. Keshav confirms your slot, an official confirmation email will be sent directly to <strong className="text-neutral-800">{email}</strong>.
+                </p>
+              </div>
+
+              <div
+                className="p-4 rounded-xl border text-left text-sm space-y-2.5"
+                style={{ background: '#FAF9F6', borderColor: '#EAF5F1' }}
+              >
+                <div className="flex justify-between">
+                  <span style={{ color: '#667573' }}>Service:</span>
+                  <span className="font-semibold" style={{ color: '#123C3A' }}>{service}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span style={{ color: '#667573' }}>Preferred Date:</span>
+                  <span className="font-semibold" style={{ color: '#123C3A' }}>{prefDate}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: '#667573' }}>Preferred Time:</span>
+                  <span className="font-semibold" style={{ color: '#123C3A' }}>{prefTime}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: '#667573' }}>Patient Name:</span>
+                  <span className="font-semibold" style={{ color: '#123C3A' }}>{fullName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: '#667573' }}>Phone:</span>
+                  <span className="font-semibold" style={{ color: '#123C3A' }}>{phone}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span style={{ color: '#667573' }}>Confirmation Email:</span>
+                  <span className="font-semibold text-xs font-mono" style={{ color: '#247C78' }}>{email}</span>
+                </div>
+                {bookingTime && (
+                  <div className="flex justify-between pt-2 border-t border-dashed" style={{ borderColor: '#E2E8F0' }}>
+                    <span className="flex items-center gap-1.5" style={{ color: '#667573' }}>
+                      <Clock className="w-3.5 h-3.5" /> Booked At:
+                    </span>
+                    <span className="font-semibold text-xs" style={{ color: '#247C78' }}>{bookingTime}</span>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={onClose}
+                className="w-full py-3 rounded-xl font-bold text-sm text-white transition-all duration-200 hover:opacity-90 shadow-md"
+                style={{ background: '#123C3A', fontFamily: 'Manrope, sans-serif' }}
+              >
+                Close & Return to Site
+              </button>
+            </div>
+          )}
+
+          {/* STEP 1 */}
+          {!submitted && step === 1 && (
+            <div className="space-y-5 animate-fadeIn">
+              {/* Service */}
+              <div>
+                <label
+                  htmlFor="modal-service"
+                  className="block text-xs font-bold uppercase tracking-wider mb-1.5"
+                  style={{ color: '#202D2C' }}
+                >
+                  Preferred Service <span aria-hidden="true">*</span>
+                </label>
+                <select
+                  id="modal-service"
+                  ref={firstFocusRef}
+                  value={service}
+                  onChange={(e) => { setService(e.target.value); setErrors((p) => ({ ...p, service: '' })); }}
+                  className="w-full p-3 rounded-xl border text-sm font-medium transition-colors duration-200"
+                  style={{
+                    borderColor: errors.service ? '#DC2626' : '#C8E8E0',
+                    background: '#FAF9F6',
+                    color: '#202D2C',
+                  }}
+                  aria-required="true"
+                  aria-invalid={!!errors.service}
+                  aria-describedby={errors.service ? 'err-service' : undefined}
+                >
+                  <option value="">Select a service…</option>
+                  {SERVICES_LIST.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+                <FieldError message={errors.service} />
+              </div>
+
+              {/* Date */}
+              <div>
+                <label
+                  htmlFor="modal-date"
+                  className="block text-xs font-bold uppercase tracking-wider mb-1.5"
+                  style={{ color: '#202D2C' }}
+                >
+                  Preferred Date <span aria-hidden="true">*</span>
+                </label>
+                <input
+                  id="modal-date"
+                  type="date"
+                  value={prefDate}
+                  min={TODAY}
+                  onChange={(e) => { setPrefDate(e.target.value); setErrors((p) => ({ ...p, prefDate: '' })); }}
+                  className="w-full p-3 rounded-xl border text-sm font-medium"
+                  style={{
+                    borderColor: errors.prefDate ? '#DC2626' : '#C8E8E0',
+                    background: '#FAF9F6',
+                    color: '#202D2C',
+                  }}
+                  aria-required="true"
+                  aria-invalid={!!errors.prefDate}
+                />
+                <FieldError message={errors.prefDate} />
+              </div>
+
+              {/* Time */}
+              <div>
+                <label
+                  htmlFor="modal-time"
+                  className="block text-xs font-bold uppercase tracking-wider mb-1.5"
+                  style={{ color: '#202D2C' }}
+                >
+                  Preferred Time
+                </label>
+                <select
+                  id="modal-time"
+                  value={prefTime}
+                  onChange={(e) => setPrefTime(e.target.value)}
+                  className="w-full p-3 rounded-xl border text-sm font-medium"
+                  style={{ borderColor: '#C8E8E0', background: '#FAF9F6', color: '#202D2C' }}
+                >
+                  {TIME_OPTIONS.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Notification notice */}
+              <div
+                className="flex items-center gap-2.5 p-3 rounded-xl text-xs font-medium"
+                style={{ background: '#EAF5F1', color: '#247C78' }}
+              >
+                <ShieldCheck className="w-4 h-4 flex-shrink-0" />
+                <span>Your appointment details will be securely sent to our team ({recipientEmail}).</span>
               </div>
             </div>
           )}
 
           {/* STEP 2 */}
-          {step === 2 && (
-            <div className="space-y-5 animate-fadeIn">
-              <div>
-                <label htmlFor="modal-date" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Select Preferred Date
-                </label>
-                <input
-                  id="modal-date"
-                  type="date"
-                  value={date}
-                  min={new Date().toISOString().split('T')[0]}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full p-3 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 font-semibold text-sm focus:ring-2 focus:ring-teal-500"
-                />
-              </div>
+          {!submitted && step === 2 && (
+            <form id="appointment-form" onSubmit={handleSubmit} noValidate className="space-y-4 animate-fadeIn">
 
+              {/* Full Name */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                  Sample Time Slots
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {TIME_SLOTS.map((t) => (
-                    <button
-                      key={t.time}
-                      type="button"
-                      onClick={() => setSlot(t.time)}
-                      className={`p-2.5 rounded-xl border text-center transition-all ${
-                        slot === t.time
-                          ? 'border-teal-600 bg-teal-600 text-white font-bold shadow-2xs'
-                          : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700 text-xs font-semibold'
-                      }`}
-                    >
-                      <div className="text-xs font-bold">{t.time}</div>
-                      <div className={`text-[10px] ${slot === t.time ? 'text-teal-100' : 'text-slate-400'}`}>
-                        {t.period}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-3 bg-teal-50 rounded-xl border border-teal-100 flex items-center gap-2 text-xs text-teal-800 font-medium">
-                <ShieldCheck className="w-4 h-4 text-teal-600 flex-shrink-0" />
-                <span>Concept Demo Wizard • No actual booking is placed.</span>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3 */}
-          {step === 3 && (
-            <div className="space-y-3.5 animate-fadeIn">
-              <div>
-                <label htmlFor="modal-fullname" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Full Name *
+                <label
+                  htmlFor="modal-fullname"
+                  className="block text-xs font-bold uppercase tracking-wider mb-1.5"
+                  style={{ color: '#202D2C' }}
+                >
+                  Full Name <span aria-hidden="true">*</span>
                 </label>
                 <input
                   id="modal-fullname"
+                  ref={firstFocusRef}
                   type="text"
+                  autoComplete="name"
                   required
-                  placeholder="e.g. Michael Scott"
-                  value={patientInfo.fullName}
-                  onChange={(e) => setPatientInfo({ ...patientInfo, fullName: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-teal-500"
+                  placeholder="Your full name"
+                  value={fullName}
+                  onChange={(e) => { setFullName(e.target.value); setErrors((p) => ({ ...p, fullName: '' })); }}
+                  className="w-full p-3 rounded-xl border text-sm"
+                  style={{
+                    borderColor: errors.fullName ? '#DC2626' : '#C8E8E0',
+                    background: '#FAF9F6',
+                    color: '#202D2C',
+                  }}
+                  aria-required="true"
+                  aria-invalid={!!errors.fullName}
                 />
+                <FieldError message={errors.fullName} />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Phone + Email */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="modal-phone" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Phone Number *
+                  <label
+                    htmlFor="modal-phone"
+                    className="block text-xs font-bold uppercase tracking-wider mb-1.5"
+                    style={{ color: '#202D2C' }}
+                  >
+                    Phone <span aria-hidden="true">*</span>
                   </label>
                   <input
                     id="modal-phone"
                     type="tel"
+                    autoComplete="tel"
                     required
-                    placeholder="(555) 000-0000"
-                    value={patientInfo.phone}
-                    onChange={(e) => setPatientInfo({ ...patientInfo, phone: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-teal-500"
+                    placeholder="+91 XXXXX XXXXX"
+                    value={phone}
+                    onChange={(e) => { setPhone(e.target.value); setErrors((p) => ({ ...p, phone: '' })); }}
+                    className="w-full p-3 rounded-xl border text-sm"
+                    style={{
+                      borderColor: errors.phone ? '#DC2626' : '#C8E8E0',
+                      background: '#FAF9F6',
+                      color: '#202D2C',
+                    }}
+                    aria-required="true"
+                    aria-invalid={!!errors.phone}
                   />
+                  <FieldError message={errors.phone} />
                 </div>
 
                 <div>
-                  <label htmlFor="modal-email" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Email Address *
+                  <label
+                    htmlFor="modal-email"
+                    className="block text-xs font-bold uppercase tracking-wider mb-1.5"
+                    style={{ color: '#202D2C' }}
+                  >
+                    Patient Email <span aria-hidden="true">*</span>
                   </label>
                   <input
                     id="modal-email"
                     type="email"
+                    autoComplete="email"
                     required
-                    placeholder="name@example.com"
-                    value={patientInfo.email}
-                    onChange={(e) => setPatientInfo({ ...patientInfo, email: e.target.value })}
-                    className="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-teal-500"
+                    placeholder="name@example.com (for confirmation)"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); setErrors((p) => ({ ...p, email: '' })); }}
+                    className="w-full p-3 rounded-xl border text-sm"
+                    style={{
+                      borderColor: errors.email ? '#DC2626' : '#C8E8E0',
+                      background: '#FAF9F6',
+                      color: '#202D2C',
+                    }}
+                    aria-required="true"
+                    aria-invalid={!!errors.email}
                   />
+                  <FieldError message={errors.email} />
                 </div>
               </div>
 
+              {/* Message */}
               <div>
-                <label htmlFor="modal-notes" className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Notes (Optional)
+                <label
+                  htmlFor="modal-message"
+                  className="block text-xs font-bold uppercase tracking-wider mb-1.5"
+                  style={{ color: '#202D2C' }}
+                >
+                  Additional Notes <span className="font-normal" style={{ color: '#667573' }}>(optional)</span>
                 </label>
                 <textarea
-                  id="modal-notes"
-                  rows="2"
-                  placeholder="Enter optional sample notes..."
-                  value={patientInfo.notes}
-                  onChange={(e) => setPatientInfo({ ...patientInfo, notes: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50 text-slate-900 text-xs sm:text-sm focus:bg-white focus:ring-2 focus:ring-teal-500"
-                ></textarea>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 4 */}
-          {step === 4 && (
-            <div className="text-center space-y-4 animate-fadeIn py-2">
-              <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-xl shadow-xs">
-                <CheckCircle2 className="w-8 h-8" />
+                  id="modal-message"
+                  rows={3}
+                  placeholder="Any specific concerns or questions…"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="w-full p-3 rounded-xl border text-sm resize-none"
+                  style={{ borderColor: '#C8E8E0', background: '#FAF9F6', color: '#202D2C' }}
+                />
               </div>
 
+              {/* Consent */}
               <div>
-                <span className="px-2.5 py-0.5 bg-teal-100 text-teal-800 text-[11px] font-extrabold rounded-full uppercase tracking-wider">
-                  Demo Code #{bookingRef}
-                </span>
-                <h4 className="text-xl font-extrabold text-slate-900 mt-1">Demo Request Submitted</h4>
-                <p className="text-slate-600 text-xs mt-1 max-w-md mx-auto">
-                  Demo request submitted successfully. (Note: This is a concept website demo; no real appointment was placed with a live clinic.)
-                </p>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    id="modal-consent"
+                    checked={consent}
+                    onChange={(e) => { setConsent(e.target.checked); setErrors((p) => ({ ...p, consent: '', submit: '' })); }}
+                    className="mt-0.5 flex-shrink-0"
+                    aria-required="true"
+                    aria-invalid={!!errors.consent}
+                    style={{ accentColor: '#247C78' }}
+                  />
+                  <span className="text-xs leading-relaxed" style={{ color: '#667573' }}>
+                    I agree to share these details for appointment scheduling and confirmation.
+                  </span>
+                </label>
+                <FieldError message={errors.consent} />
               </div>
 
-              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left space-y-1.5 text-xs">
-                <div className="flex justify-between border-b pb-1.5">
-                  <span className="text-slate-500 font-medium">Selected Treatment:</span>
-                  <span className="font-bold text-slate-900">{service}</span>
+              {/* Submit Error Banner */}
+              {errors.submit && (
+                <div
+                  className="flex items-start gap-2.5 p-3 rounded-xl text-xs font-medium text-red-700 bg-red-50 border border-red-200"
+                  role="alert"
+                >
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-red-600" />
+                  <span>{errors.submit}</span>
                 </div>
-                <div className="flex justify-between border-b pb-1.5">
-                  <span className="text-slate-500 font-medium">Doctor:</span>
-                  <span className="font-bold text-slate-900">{doctor.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Sample Date & Time:</span>
-                  <span className="font-bold text-teal-700">{date} at {slot}</span>
-                </div>
-              </div>
-
-              <button
-                onClick={resetAndClose}
-                className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors shadow-md"
-              >
-                Close & Return To Website
-              </button>
-            </div>
+              )}
+            </form>
           )}
-
         </div>
 
-        {/* Modal Footer Controls */}
-        {step <= 3 && (
-          <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-between gap-3">
+        {/* Footer Controls */}
+        {!submitted && (
+          <div
+            className="flex items-center justify-between gap-3 px-6 py-4 border-t"
+            style={{ borderColor: '#EAF5F1', background: '#FAF9F6' }}
+          >
             {step > 1 ? (
               <button
-                onClick={handlePrevStep}
-                className="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1"
+                type="button"
+                onClick={() => { setStep(1); setErrors({}); }}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-semibold transition-colors duration-200 hover:bg-white"
+                style={{ borderColor: '#C8E8E0', color: '#667573', background: 'transparent' }}
               >
-                <ArrowLeft className="w-3.5 h-3.5" /> Back
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back
+              </button>
+            ) : <div />}
+
+            {step === 1 ? (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200 hover:opacity-90 shadow-md"
+                style={{ background: '#247C78', fontFamily: 'Manrope, sans-serif' }}
+              >
+                Continue
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             ) : (
-              <div></div>
+              <button
+                type="submit"
+                form="appointment-form"
+                disabled={submitting}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200 hover:opacity-90 shadow-md disabled:opacity-60"
+                style={{ background: '#123C3A', fontFamily: 'Manrope, sans-serif' }}
+                aria-busy={submitting}
+              >
+                {submitting ? (
+                  <>
+                    <span
+                      className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin"
+                      aria-hidden="true"
+                    />
+                    Sending Details…
+                  </>
+                ) : (
+                  <>
+                    Confirm & Send Booking
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </>
+                )}
+              </button>
             )}
-
-            <button
-              onClick={handleNextStep}
-              className="px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-md shadow-teal-600/20 flex items-center gap-1"
-            >
-              <span>{step === 3 ? 'Submit Demo Request' : 'Continue'}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
           </div>
         )}
-
       </div>
     </div>
   );

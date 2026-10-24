@@ -1,73 +1,114 @@
 import React, { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 const FAQ_ITEMS = [
   {
-    question: 'Is dental treatment at AuraDental really 100% painless?',
-    answer: 'Yes! We utilize computerized local anesthesia delivery systems (The Wand), topical numbing gels, soft-tissue laser dentistry, and optional Nitrous Oxide (laughing gas) or IV sedation. You will feel relaxed and comfortable throughout.'
+    q: 'How can I request an appointment?',
+    a: 'You can request an appointment using the enquiry form on this website. Fill in your name, contact details, preferred date, and the service you\'re interested in. Our team will follow up to confirm availability.',
   },
   {
-    question: 'How long does laser teeth whitening last?',
-    answer: 'Results typically last 12 to 24 months depending on diet (coffee, red wine) and oral hygiene. We provide a custom take-home whitening tray and gel to maintain your bright shade effortlessly.'
+    q: 'What should I bring to my first visit?',
+    a: 'For your first visit, it helps to bring any previous dental records or X-rays if you have them, along with a list of any medications you currently take. Arriving a few minutes early also helps us complete a brief registration form.',
   },
   {
-    question: 'Do you accept dental insurance or offer financing?',
-    answer: 'We accept most major PPO dental insurance plans (Delta Dental, Cigna, MetLife, Guardian, Aetna). For out-of-pocket costs, we offer 0% interest monthly payment options through CareCredit & Sunbit.'
+    q: 'How often should I schedule a dental checkup?',
+    a: 'Most dental professionals recommend a routine checkup every six months. However, the right frequency for you depends on your individual oral health. Your dentist can advise on the most suitable schedule during your visit.',
   },
   {
-    question: 'What should I do in case of a sudden dental emergency?',
-    answer: 'Call our emergency hotline at (555) 234-5678 immediately. We reserve daily emergency appointment slots for toothaches, knocked-out teeth, or broken crowns with same-day pain relief.'
+    q: 'Can I ask about treatment options before visiting?',
+    a: 'Absolutely. You\'re welcome to contact us with any preliminary questions. Please note that a proper assessment and personalised recommendations can only be made following an in-clinic examination.',
   },
   {
-    question: 'How does the initial consultation work?',
-    answer: 'During your 45-minute initial consultation, we take 3D digital oral scans, perform a comprehensive oral health exam, discuss your aesthetic goals, and present a custom treatment plan with transparent costs.'
-  }
+    q: 'Is this a real clinic I can visit?',
+    a: 'No. Ivory Dental Studio is a fictional brand created for a freelance portfolio demonstration. It does not represent a real clinic. Contact details on this site are placeholders only.',
+  },
+  {
+    q: 'How can I contact the clinic?',
+    a: 'You can reach us through the contact section of this site. Phone and email links will be active once the demo is configured with real clinic details.',
+  },
 ];
 
 export default function Faq() {
-  const [openIndex, setOpenIndex] = useState(0);
+  const [openIdx, setOpenIdx] = useState(null);
+
+  const toggle = (idx) => setOpenIdx(openIdx === idx ? null : idx);
 
   return (
-    <section id="faq" className="py-16 lg:py-24 bg-slate-50 border-t border-slate-200/80">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+    <section id="faq" className="py-16 lg:py-24" style={{ background: '#EAF5F1' }}>
+      <div className="container-site max-w-3xl">
+
         {/* Header */}
-        <div className="text-center space-y-3 mb-12">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-100 text-teal-800">
-            <HelpCircle className="w-3.5 h-3.5" /> Frequently Asked Questions
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Have Questions? We Have Answers.
+        <div className="text-center mb-12">
+          <p
+            className="text-xs font-bold uppercase tracking-[0.16em] mb-3"
+            style={{ color: '#247C78' }}
+          >
+            FAQs
+          </p>
+          <h2
+            className="text-3xl sm:text-4xl font-extrabold leading-tight mb-4"
+            style={{ color: '#123C3A', fontFamily: 'Manrope, sans-serif' }}
+          >
+            Frequently Asked Questions
           </h2>
-          <p className="text-slate-600 text-base sm:text-lg">
-            Everything you need to know about our painless treatments, insurance coverage, and booking process.
+          <p className="text-base leading-relaxed" style={{ color: '#667573' }}>
+            General information about visiting Ivory Dental Studio and how to get in touch.
           </p>
         </div>
 
-        {/* Accordions */}
-        <div className="space-y-4">
-          {FAQ_ITEMS.map((item, idx) => {
-            const isOpen = openIndex === idx;
+        {/* Accordion */}
+        <div className="space-y-3">
+          {FAQ_ITEMS.map(({ q, a }, idx) => {
+            const isOpen = openIdx === idx;
+            const headerId = `faq-head-${idx}`;
+            const panelId = `faq-panel-${idx}`;
             return (
-              <div 
+              <div
                 key={idx}
-                className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm transition-all"
+                className="rounded-2xl border overflow-hidden"
+                style={{ background: 'white', borderColor: isOpen ? '#247C78' : '#C8E8E0' }}
               >
-                <button
-                  onClick={() => setOpenIndex(isOpen ? -1 : idx)}
-                  className="w-full p-5 text-left font-bold text-slate-900 text-base sm:text-lg flex justify-between items-center gap-4 hover:text-teal-600 transition-colors"
-                >
-                  <span>{item.question}</span>
-                  {isOpen ? (
-                    <ChevronUp className="w-5 h-5 text-teal-600 flex-shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-slate-400 flex-shrink-0" />
-                  )}
-                </button>
+                <h3>
+                  <button
+                    id={headerId}
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    onClick={() => toggle(idx)}
+                    className="w-full flex items-center justify-between text-left px-6 py-4 gap-4 transition-colors duration-200"
+                    style={{
+                      color: isOpen ? '#247C78' : '#202D2C',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <span
+                      className="text-sm sm:text-base font-semibold leading-snug"
+                      style={{ fontFamily: 'Manrope, sans-serif' }}
+                    >
+                      {q}
+                    </span>
+                    <ChevronDown
+                      className="w-5 h-5 flex-shrink-0 transition-transform duration-300"
+                      style={{
+                        color: '#247C78',
+                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      }}
+                      aria-hidden="true"
+                    />
+                  </button>
+                </h3>
 
                 {isOpen && (
-                  <div className="px-5 pb-5 pt-0 text-slate-600 text-sm sm:text-base leading-relaxed border-t border-slate-100 mt-1 pt-3 animate-fadeIn">
-                    {item.answer}
+                  <div
+                    id={panelId}
+                    role="region"
+                    aria-labelledby={headerId}
+                    className="px-6 pb-5 pt-1 animate-fadeIn"
+                  >
+                    <p className="text-sm leading-relaxed" style={{ color: '#667573' }}>
+                      {a}
+                    </p>
                   </div>
                 )}
               </div>
